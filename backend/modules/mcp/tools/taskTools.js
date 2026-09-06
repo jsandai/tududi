@@ -20,6 +20,7 @@ const {
     processDeferUntilForStorage,
 } = require('../../../utils/timezone-utils');
 const permissionsService = require('../../../services/permissionsService');
+const { filterTasksByParams } = require('../../tasks/queries/query-builders');
 
 const RECURRENCE_TYPES = [
     'none',
@@ -162,48 +163,27 @@ function registerTaskTools(server, context, tools) {
             },
         },
         handler: async (params) => {
-            const whereClause =
-                await permissionsService.ownershipOrPermissionWhere(
-                    'task',
-                    context.userId
-                );
             const limit = params.limit || 50;
+            const queryParams = {
+                ...params,
+                include_subtasks: true,
+            };
 
-            if (params.status) {
-                const statusMap = {
-                    not_started: 0,
-                    pending: 0,
-                    in_progress: 1,
-                    done: 2,
-                    completed: 2,
-                    archived: 3,
-                    waiting: 4,
-                    cancelled: 5,
-                    planned: 6,
-                };
-                whereClause.status = statusMap[params.status];
+            if (params.type === 'completed' || params.type === 'archived') {
+                queryParams.type = 'all';
+                queryParams.status = params.type;
+            } else if (!params.type && !params.status) {
+                queryParams.type = 'all';
+                queryParams.status = 'all';
             }
 
-            if (params.project_id) {
-                whereClause.project_id = params.project_id;
-            }
-
-            if (params.type === 'completed') {
-                whereClause.status = 2;
-            } else if (params.type === 'archived') {
-                whereClause.status = 3;
-            } else if (params.type === 'today' || params.type === 'upcoming') {
-                whereClause.status = { [Op.ne]: 3 };
-            }
-
-            const tasks = await taskRepository.findAll(whereClause, {
-                include: [
-                    { model: Project, as: 'Project' },
-                    { model: Tag, as: 'Tags' },
-                ],
-                limit: limit,
-                order: [['created_at', 'DESC']],
-            });
+            const { rows: tasks } = await filterTasksByParams(
+                queryParams,
+                context.userId,
+                context.user.timezone,
+                null,
+                { limit, offset: 0 }
+            );
 
             const serializedTasks = await serializeTasks(
                 tasks,

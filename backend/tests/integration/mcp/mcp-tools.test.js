@@ -242,7 +242,7 @@ describe('MCP Tools Integration', () => {
                 await Task.create({
                     user_id: user.id,
                     name: 'Active Task',
-                    status: 0,
+                    status: 6,
                 });
                 await Task.create({
                     user_id: user.id,
@@ -263,6 +263,33 @@ describe('MCP Tools Integration', () => {
                 ).toBe(false);
                 expect(
                     content.tasks.some((t) => t.name === 'Active Task')
+                ).toBe(true);
+            });
+
+            it('should use the Today view status rules', async () => {
+                await Task.create({
+                    user_id: user.id,
+                    name: 'Not Started Task',
+                    status: 0,
+                });
+                await Task.create({
+                    user_id: user.id,
+                    name: 'Waiting Task',
+                    status: 4,
+                });
+
+                const response = await callMcpTool(
+                    apiTokenValue,
+                    'list_tasks',
+                    { type: 'today' }
+                );
+
+                const { content } = getToolContent(response);
+                expect(
+                    content.tasks.some((t) => t.name === 'Not Started Task')
+                ).toBe(false);
+                expect(
+                    content.tasks.some((t) => t.name === 'Waiting Task')
                 ).toBe(true);
             });
 

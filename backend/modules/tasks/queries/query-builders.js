@@ -332,6 +332,20 @@ async function filterTasksByParams(
             }
     }
 
+    if (
+        params.status &&
+        !['active', 'all'].includes(params.status) &&
+        params.type !== 'today'
+    ) {
+        whereClause.status = Task.getStatusValue(
+            params.status === 'pending'
+                ? 'not_started'
+                : params.status === 'completed'
+                  ? 'done'
+                  : params.status
+        );
+    }
+
     let tagFilteredTaskIds = null;
 
     if (params.priority) {
