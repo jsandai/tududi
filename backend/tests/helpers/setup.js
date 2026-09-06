@@ -33,6 +33,7 @@ const { isSqlite, truncateTables } = require('../../utils/db-dialect');
 
 // Children before parents: PostgreSQL deletes these with constraints on.
 const CLEANUP_TABLES = [
+    'task_relations',
     'tasks_tags',
     'notes_tags',
     'projects_tags',

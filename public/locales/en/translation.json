@@ -1787,5 +1787,28 @@
     "open": "Open",
     "streaks": "Streaks",
     "areaBreakdown": "Area Breakdown"
+  },
+  "taskRelations": {
+    "title": "Relations",
+    "add": "Add relation",
+    "empty": "No relations yet",
+    "selectType": "Relation type",
+    "searchTasks": "Search tasks",
+    "noTasks": "No tasks found",
+    "saving": "Adding...",
+    "remove": "Remove relation",
+    "blocked": "Blocked",
+    "blockedDescription": "This task has an unfinished blocker",
+    "loadError": "Failed to load task relations",
+    "optionsError": "Failed to load tasks",
+    "createError": "Failed to add task relation",
+    "removeError": "Failed to remove task relation",
+    "types": {
+      "blocks": "Blocks",
+      "blocked_by": "Blocked by",
+      "related_to": "Related to",
+      "duplicates": "Duplicates",
+      "duplicated_by": "Duplicated by"
+    }
   }
 }

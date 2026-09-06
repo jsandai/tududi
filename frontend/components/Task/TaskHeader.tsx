@@ -11,6 +11,7 @@ import {
     EllipsisVerticalIcon,
     PencilIcon,
     TrashIcon,
+    LockClosedIcon,
 } from '@heroicons/react/24/outline';
 import { TagIcon, FolderIcon, FireIcon } from '@heroicons/react/24/solid';
 import { useTranslation } from 'react-i18next';
@@ -199,6 +200,17 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
         !!formattedDeferUntil ||
         !!task.parent_task;
 
+    const BlockedBadge = () =>
+        task.is_blocked ? (
+            <span
+                className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                title={t('taskRelations.blockedDescription')}
+            >
+                <LockClosedIcon className="h-3 w-3" />
+                {t('taskRelations.blocked')}
+            </span>
+        ) : null;
+
     return (
         <div
             className={`${compact ? 'py-3' : hasMetadata ? 'py-2' : 'py-3'} px-4 cursor-pointer group`}
@@ -245,6 +257,7 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
                                         <span className="text-sm font-medium text-gray-900 dark:text-gray-300 tracking-tight truncate">
                                             {task.original_name || task.name}
                                         </span>
+                                        <BlockedBadge />
                                     </div>
                                     <SubtasksToggleButton />
                                 </div>
@@ -329,6 +342,7 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
                                 <span className="text-md font-medium text-gray-900 dark:text-gray-300 truncate">
                                     {task.original_name || task.name}
                                 </span>
+                                <BlockedBadge />
                                 <div className="flex-shrink-0">
                                     <SubtasksToggleButton />
                                 </div>
@@ -552,6 +566,7 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
                                 <span className="truncate flex-1">
                                     {task.original_name || task.name}
                                 </span>
+                                <BlockedBadge />
                                 <SubtasksToggleButton />
                                 {showTaskContextMenu && (
                                     <div

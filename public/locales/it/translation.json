@@ -1776,5 +1776,28 @@
       "backups_import": "l'importazione dei backup",
       "attachments": "gli allegati"
     }
+  },
+  "taskRelations": {
+    "title": "Relazioni",
+    "add": "Aggiungi relazione",
+    "empty": "Nessuna relazione",
+    "selectType": "Tipo di relazione",
+    "searchTasks": "Cerca attività",
+    "noTasks": "Nessuna attività trovata",
+    "saving": "Aggiunta...",
+    "remove": "Rimuovi relazione",
+    "blocked": "Bloccata",
+    "blockedDescription": "Questa attività ha un'attività bloccante non completata",
+    "loadError": "Impossibile caricare le relazioni",
+    "optionsError": "Impossibile caricare le attività",
+    "createError": "Impossibile aggiungere la relazione",
+    "removeError": "Impossibile rimuovere la relazione",
+    "types": {
+      "blocks": "Blocca",
+      "blocked_by": "Bloccata da",
+      "related_to": "Correlata a",
+      "duplicates": "Duplica",
+      "duplicated_by": "Duplicata da"
+    }
   }
 }

@@ -18,7 +18,7 @@ This guide explains how to configure and use the Model Context Protocol (MCP) in
     - [Stdio Mode (Local)](#stdio-mode-local)
     - [HTTP Mode (Remote)](#http-mode-remote)
 - [Available Tools](#available-tools)
-    - [Tasks Tools (8)](#tasks-tools-8)
+    - [Tasks Tools (11)](#tasks-tools-11)
     - [Projects Tools (5)](#projects-tools-5)
     - [Inbox Tools (6)](#inbox-tools-6)
     - [Views Tools (5)](#views-tools-5)
@@ -180,9 +180,9 @@ Tududi supports two transport modes for different deployment scenarios:
 
 ## Available Tools
 
-Tududi exposes 59 MCP tools organized into 11 categories. All tools are scoped to the authenticated user — you can never access another user's data.
+Tududi exposes 62 MCP tools organized into 11 categories. All tools are scoped to the authenticated user — you can never access another user's data.
 
-### Tasks Tools (8)
+### Tasks Tools (11)
 
 #### `list_tasks`
 
@@ -345,6 +345,69 @@ Permanently delete a task.
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `id` | number/string | Yes | Task ID or UID |
+
+---
+
+#### `create_task_relation`
+
+Relate two tasks. The relation is stored once and read from either side, so creating `blocks` on one task shows `blocked_by` on the other.
+
+**Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `task_id` | number/string | Yes | Task ID or UID |
+| `related_task_id` | number/string | Yes | Related task ID or UID |
+| `type` | string | Yes | `blocks`, `blocked_by`, `related_to`, `duplicates`, `duplicated_by` |
+
+**Example:**
+
+```json
+{
+    "task_id": "xyz789",
+    "related_task_id": "abc123",
+    "type": "blocked_by"
+}
+```
+
+A relation that would close a cycle in the blocking graph is refused.
+
+---
+
+#### `list_task_relations`
+
+List the relations for a task, in both directions. Each relation is named from the given task's point of view, so a task blocked by another reports `blocked_by`.
+
+**Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `task_id` | number/string | Yes | Task ID or UID |
+
+**Returns:**
+
+```json
+{
+    "count": 1,
+    "relations": [
+        {
+            "uid": "rel456",
+            "type": "blocked_by",
+            "related_task": { "uid": "abc123", "name": "Draft the copy" }
+        }
+    ]
+}
+```
+
+---
+
+#### `remove_task_relation`
+
+Remove a relation from a task. Because a relation is stored once, removing it from either side removes it entirely.
+
+**Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `task_id` | number/string | Yes | Task ID or UID |
+| `relation_id` | string | Yes | Relation UID from `list_task_relations` |
 
 ---
 

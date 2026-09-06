@@ -1776,5 +1776,28 @@
       "backups_import": "nhập bản sao lưu",
       "attachments": "tệp đính kèm"
     }
+  },
+  "taskRelations": {
+    "title": "Quan hệ",
+    "add": "Thêm quan hệ",
+    "empty": "Chưa có quan hệ",
+    "selectType": "Loại quan hệ",
+    "searchTasks": "Tìm công việc",
+    "noTasks": "Không tìm thấy công việc",
+    "saving": "Đang thêm...",
+    "remove": "Xóa quan hệ",
+    "blocked": "Bị chặn",
+    "blockedDescription": "Công việc này có một công việc chặn chưa hoàn thành",
+    "loadError": "Không thể tải quan hệ công việc",
+    "optionsError": "Không thể tải công việc",
+    "createError": "Không thể thêm quan hệ công việc",
+    "removeError": "Không thể xóa quan hệ công việc",
+    "types": {
+      "blocks": "Chặn",
+      "blocked_by": "Bị chặn bởi",
+      "related_to": "Liên quan đến",
+      "duplicates": "Trùng với",
+      "duplicated_by": "Bị trùng bởi"
+    }
   }
 }
