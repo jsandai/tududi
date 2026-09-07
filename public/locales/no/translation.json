@@ -1781,5 +1781,28 @@
       "backups_import": "import av sikkerhetskopier",
       "attachments": "vedlegg"
     }
+  },
+  "taskRelations": {
+    "title": "Relasjoner",
+    "add": "Legg til relasjon",
+    "empty": "Ingen relasjoner ennå",
+    "selectType": "Relasjonstype",
+    "searchTasks": "Søk etter oppgaver",
+    "noTasks": "Ingen oppgaver funnet",
+    "saving": "Legger til...",
+    "remove": "Fjern relasjon",
+    "blocked": "Blokkert",
+    "blockedDescription": "Denne oppgaven har en uferdig blokkerende oppgave",
+    "loadError": "Kunne ikke laste oppgaverelasjoner",
+    "optionsError": "Kunne ikke laste oppgaver",
+    "createError": "Kunne ikke legge til oppgaverelasjon",
+    "removeError": "Kunne ikke fjerne oppgaverelasjon",
+    "types": {
+      "blocks": "Blokkerer",
+      "blocked_by": "Blokkert av",
+      "related_to": "Relatert til",
+      "duplicates": "Dupliserer",
+      "duplicated_by": "Duplisert av"
+    }
   }
 }

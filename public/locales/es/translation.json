@@ -1763,5 +1763,28 @@
       "backups_import": "la importación de copias",
       "attachments": "los adjuntos"
     }
+  },
+  "taskRelations": {
+    "title": "Relaciones",
+    "add": "Añadir relación",
+    "empty": "Aún no hay relaciones",
+    "selectType": "Tipo de relación",
+    "searchTasks": "Buscar tareas",
+    "noTasks": "No se encontraron tareas",
+    "saving": "Añadiendo...",
+    "remove": "Eliminar relación",
+    "blocked": "Bloqueada",
+    "blockedDescription": "Esta tarea tiene un bloqueo sin completar",
+    "loadError": "No se pudieron cargar las relaciones",
+    "optionsError": "No se pudieron cargar las tareas",
+    "createError": "No se pudo añadir la relación",
+    "removeError": "No se pudo eliminar la relación",
+    "types": {
+      "blocks": "Bloquea",
+      "blocked_by": "Bloqueada por",
+      "related_to": "Relacionada con",
+      "duplicates": "Duplica",
+      "duplicated_by": "Duplicada por"
+    }
   }
 }

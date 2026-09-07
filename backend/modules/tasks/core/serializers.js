@@ -10,6 +10,7 @@ const {
 const taskRepository = require('../repository');
 const { Task } = require('../../../models');
 const { Op } = require('sequelize');
+const relationService = require('../relations/service');
 
 // Sort tags alphabetically by name (case-insensitive)
 function sortTags(tags) {
@@ -39,6 +40,13 @@ async function serializeTask(
           : await getTaskTodayMoveCount(task.id);
 
     const safeTimezone = getSafeTimezone(userTimezone);
+    const relationStateMap =
+        options.relationStateMap ||
+        (await relationService.getBlockedTaskIds([
+            task.id,
+            ...(taskJson.Subtasks || []).map((subtask) => subtask.id),
+        ]));
+    const isBlocked = relationStateMap.has(task.id);
 
     const { Subtasks, ...taskWithoutSubtasks } = taskJson;
 
@@ -147,6 +155,7 @@ async function serializeTask(
                           ? subtask.completed_at.toISOString()
                           : new Date(subtask.completed_at).toISOString()
                       : null,
+                  is_blocked: relationStateMap.has(subtask.id),
               }))
             : [],
         completed_at: task.completed_at
@@ -156,6 +165,7 @@ async function serializeTask(
             : null,
         today_move_count: todayMoveCount,
         parent_task: parentTaskInfo,
+        is_blocked: isBlocked,
     };
 }
 
@@ -174,6 +184,12 @@ async function serializeTasks(
         prebuiltMoveCountMap !== null
             ? prebuiltMoveCountMap
             : await getTaskTodayMoveCounts(tasks.map((t) => t.id));
+    const relationStateMap = await relationService.getBlockedTaskIds(
+        tasks.flatMap((task) => [
+            task.id,
+            ...(task.Subtasks || []).map((subtask) => subtask.id),
+        ])
+    );
 
     // Batch-fetch recurring parent UIDs to avoid per-task DB queries
     let parentUidMap = prebuiltParentUidMap;
@@ -230,7 +246,7 @@ async function serializeTasks(
             serializeTask(
                 task,
                 userTimezone,
-                options,
+                { ...options, relationStateMap },
                 moveCountMap,
                 parentUidMap,
                 parentTaskIds.length > 0 ? parentTaskMap : null

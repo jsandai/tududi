@@ -1776,5 +1776,28 @@
       "backups_import": "バックアップのインポート",
       "attachments": "添付ファイル"
     }
+  },
+  "taskRelations": {
+    "title": "関連",
+    "add": "関連を追加",
+    "empty": "関連はまだありません",
+    "selectType": "関連の種類",
+    "searchTasks": "タスクを検索",
+    "noTasks": "タスクが見つかりません",
+    "saving": "追加中...",
+    "remove": "関連を削除",
+    "blocked": "ブロック中",
+    "blockedDescription": "このタスクには未完了のブロッカーがあります",
+    "loadError": "タスクの関連を読み込めませんでした",
+    "optionsError": "タスクを読み込めませんでした",
+    "createError": "タスクの関連を追加できませんでした",
+    "removeError": "タスクの関連を削除できませんでした",
+    "types": {
+      "blocks": "ブロックする",
+      "blocked_by": "ブロックされている",
+      "related_to": "関連している",
+      "duplicates": "重複する",
+      "duplicated_by": "重複されている"
+    }
   }
 }

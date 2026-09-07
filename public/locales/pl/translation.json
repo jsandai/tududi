@@ -1776,5 +1776,28 @@
       "backups_import": "import kopii zapasowych",
       "attachments": "załączniki"
     }
+  },
+  "taskRelations": {
+    "title": "Relacje",
+    "add": "Dodaj relację",
+    "empty": "Brak relacji",
+    "selectType": "Typ relacji",
+    "searchTasks": "Szukaj zadań",
+    "noTasks": "Nie znaleziono zadań",
+    "saving": "Dodawanie...",
+    "remove": "Usuń relację",
+    "blocked": "Zablokowane",
+    "blockedDescription": "To zadanie ma nieukończone zadanie blokujące",
+    "loadError": "Nie udało się wczytać relacji",
+    "optionsError": "Nie udało się wczytać zadań",
+    "createError": "Nie udało się dodać relacji",
+    "removeError": "Nie udało się usunąć relacji",
+    "types": {
+      "blocks": "Blokuje",
+      "blocked_by": "Zablokowane przez",
+      "related_to": "Powiązane z",
+      "duplicates": "Duplikuje",
+      "duplicated_by": "Zduplikowane przez"
+    }
   }
 }

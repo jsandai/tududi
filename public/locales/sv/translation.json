@@ -1776,5 +1776,28 @@
       "backups_import": "import av säkerhetskopior",
       "attachments": "bilagor"
     }
+  },
+  "taskRelations": {
+    "title": "Relationer",
+    "add": "Lägg till relation",
+    "empty": "Inga relationer ännu",
+    "selectType": "Relationstyp",
+    "searchTasks": "Sök uppgifter",
+    "noTasks": "Inga uppgifter hittades",
+    "saving": "Lägger till...",
+    "remove": "Ta bort relation",
+    "blocked": "Blockerad",
+    "blockedDescription": "Den här uppgiften har en oavslutad blockerare",
+    "loadError": "Kunde inte läsa in uppgiftsrelationer",
+    "optionsError": "Kunde inte läsa in uppgifter",
+    "createError": "Kunde inte lägga till uppgiftsrelation",
+    "removeError": "Kunde inte ta bort uppgiftsrelation",
+    "types": {
+      "blocks": "Blockerar",
+      "blocked_by": "Blockerad av",
+      "related_to": "Relaterad till",
+      "duplicates": "Duplicerar",
+      "duplicated_by": "Duplicerad av"
+    }
   }
 }

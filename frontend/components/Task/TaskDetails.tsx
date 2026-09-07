@@ -28,6 +28,7 @@ import {
     TaskAreaCard,
     TaskTagsCard,
     TaskSubtasksCard,
+    TaskRelationsCard,
     TaskRecurrenceCard,
     TaskDueDateCard,
     TaskDeferUntilCard,
@@ -1453,6 +1454,7 @@ const TaskDetails: React.FC = () => {
                                     onSubtaskDelete={handleSubtaskDelete}
                                     onQuickAdd={handleQuickAddSubtask}
                                 />
+                                <TaskRelationsCard task={task} />
                                 <TaskRecurrenceCard
                                     task={task}
                                     parentTask={parentTask}

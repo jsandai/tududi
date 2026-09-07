@@ -8,11 +8,13 @@ const {
 } = require('../../../models');
 const { Op, QueryTypes } = require('sequelize');
 const permissionsService = require('../../../services/permissionsService');
+const { ciLike } = require('../../../utils/db-dialect');
 const {
     getSafeTimezone,
     getUpcomingRangeInUTC,
     getTodayBoundsInUTC,
 } = require('../../../utils/timezone-utils');
+const relationService = require('../relations/service');
 
 // `page` ({ limit, offset }) switches to database pagination: the result is
 // then { rows, count } instead of an array. Callers that post-process the
@@ -39,57 +41,66 @@ async function filterTasksByParams(
         ...(includeSubtasks ? {} : { parent_task_id: null }),
     };
 
-    whereClause[Op.or] = [
-        {
-            [Op.and]: [
-                {
-                    [Op.or]: [
-                        { recurrence_type: 'none' },
-                        { recurrence_type: null },
-                        { recurrence_type: '' },
-                    ],
-                },
-                { recurring_parent_id: null },
-            ],
-        },
-        {
-            [Op.and]: [
-                { recurrence_type: { [Op.ne]: 'none' } },
-                { recurrence_type: { [Op.ne]: null } },
-                { recurrence_type: { [Op.ne]: '' } },
-                { recurring_parent_id: null },
-                {
-                    [Op.or]: [
-                        { due_date: null },
-                        {
-                            due_date: {
-                                [Op.gte]: new Date(
-                                    new Date().setHours(0, 0, 0, 0)
-                                ),
+    // The list views hide recurring occurrences that have already passed, so a
+    // recurring task shows its next occurrence rather than its whole history.
+    // Callers that need the complete set opt out of that window.
+    const includeAllRecurrences =
+        params.include_all_recurrences === true ||
+        params.include_all_recurrences === 'true';
+
+    if (!includeAllRecurrences) {
+        whereClause[Op.or] = [
+            {
+                [Op.and]: [
+                    {
+                        [Op.or]: [
+                            { recurrence_type: 'none' },
+                            { recurrence_type: null },
+                            { recurrence_type: '' },
+                        ],
+                    },
+                    { recurring_parent_id: null },
+                ],
+            },
+            {
+                [Op.and]: [
+                    { recurrence_type: { [Op.ne]: 'none' } },
+                    { recurrence_type: { [Op.ne]: null } },
+                    { recurrence_type: { [Op.ne]: '' } },
+                    { recurring_parent_id: null },
+                    {
+                        [Op.or]: [
+                            { due_date: null },
+                            {
+                                due_date: {
+                                    [Op.gte]: new Date(
+                                        new Date().setHours(0, 0, 0, 0)
+                                    ),
+                                },
                             },
-                        },
-                    ],
-                },
-            ],
-        },
-        {
-            [Op.and]: [
-                { recurring_parent_id: { [Op.ne]: null } },
-                {
-                    [Op.or]: [
-                        { due_date: null },
-                        {
-                            due_date: {
-                                [Op.gte]: new Date(
-                                    new Date().setHours(0, 0, 0, 0)
-                                ),
+                        ],
+                    },
+                ],
+            },
+            {
+                [Op.and]: [
+                    { recurring_parent_id: { [Op.ne]: null } },
+                    {
+                        [Op.or]: [
+                            { due_date: null },
+                            {
+                                due_date: {
+                                    [Op.gte]: new Date(
+                                        new Date().setHours(0, 0, 0, 0)
+                                    ),
+                                },
                             },
-                        },
-                    ],
-                },
-            ],
-        },
-    ];
+                        ],
+                    },
+                ],
+            },
+        ];
+    }
     let includeClause = [
         {
             model: Tag,
@@ -332,6 +343,27 @@ async function filterTasksByParams(
             }
     }
 
+    // The statuses the switch above leaves alone, such as waiting and
+    // in_progress. 'done' and 'completed' are excluded because the switch
+    // already resolved them to DONE or ARCHIVED, and matching an exact
+    // status here would drop archived tasks from the Completed filter.
+    // exact_status opts back in to a single status, for callers that name one
+    // status and mean only that one.
+    if (
+        params.status &&
+        (params.exact_status ||
+            !['active', 'all', 'done', 'completed'].includes(params.status)) &&
+        params.type !== 'today'
+    ) {
+        whereClause.status = Task.getStatusValue(
+            params.status === 'pending'
+                ? 'not_started'
+                : params.status === 'completed'
+                  ? 'done'
+                  : params.status
+        );
+    }
+
     let tagFilteredTaskIds = null;
 
     if (params.priority) {
@@ -421,8 +453,40 @@ async function filterTasksByParams(
         whereClause.assigned_to = params.assigned_to;
     }
 
+    const actionableConditions = [];
+    if (params.actionable === true || params.actionable === 'true') {
+        actionableConditions.push(
+            {
+                status: {
+                    [Op.notIn]: [
+                        Task.STATUS.DONE,
+                        Task.STATUS.ARCHIVED,
+                        Task.STATUS.CANCELLED,
+                    ],
+                },
+            },
+            {
+                [Op.or]: [
+                    { defer_until: null },
+                    { defer_until: { [Op.lte]: new Date() } },
+                ],
+            },
+            relationService.getActionableRelationPredicate()
+        );
+    }
+
+    // Applied after the switch because the upcoming branch replaces
+    // whereClause outright.
+    const searchTerm =
+        typeof params.search === 'string' ? params.search.trim() : '';
+
     const finalWhereClause = {
-        [Op.and]: [ownedOrShared, whereClause],
+        [Op.and]: [
+            ownedOrShared,
+            whereClause,
+            ...actionableConditions,
+            ...(searchTerm ? [{ name: ciLike(`%${searchTerm}%`) }] : []),
+        ],
     };
 
     if (page) {
