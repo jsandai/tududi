@@ -79,7 +79,7 @@ async function listMcpTools(req, res) {
     const tools = [
         {
             category: 'Tasks',
-            count: 8,
+            count: 11,
             tools: [
                 'list_tasks',
                 'get_task',
@@ -87,6 +87,9 @@ async function listMcpTools(req, res) {
                 'update_task',
                 'complete_task',
                 'delete_task',
+                'create_task_relation',
+                'list_task_relations',
+                'remove_task_relation',
                 'add_subtask',
                 'get_task_metrics',
             ],

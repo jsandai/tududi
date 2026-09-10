@@ -12,6 +12,7 @@ const { validateUid, validateName } = require('./utils/validation');
 const { NotFoundError, ValidationError } = require('../../shared/errors');
 const { uid: generateUid } = require('../../utils/uid');
 const { sortTags } = require('../tasks/core/serializers');
+const relationService = require('../tasks/relations/service');
 const { validateTagName } = require('../tags/tagsService');
 const { logError } = require('../../services/logService');
 const { getConfig } = require('../../config/config');
@@ -218,6 +219,7 @@ class TemplatesService {
 
         await this._copyTasksToProject(source, template, userId, {
             resetStatus: true,
+            copyStoredRelations: true,
         });
 
         if (sourceJson.Tags && sourceJson.Tags.length > 0) {
@@ -277,6 +279,7 @@ class TemplatesService {
         await this._copyTasksToProject(template, newProject, userId, {
             resetStatus: options.resetStatus !== false,
             startDate: options.startDate,
+            copyStoredRelations: true,
         });
 
         if (templateJson.Tags && templateJson.Tags.length > 0) {
@@ -361,7 +364,7 @@ class TemplatesService {
                 const nestedSubtasks = task.Subtasks || task.subtasks || [];
                 if (nestedSubtasks.length > 0) {
                     for (const sub of nestedSubtasks) {
-                        await Task.create(
+                        const newSubtask = await Task.create(
                             {
                                 uid: generateUid(),
                                 name: sub.name,
@@ -379,6 +382,8 @@ class TemplatesService {
                             },
                             { transaction }
                         );
+
+                        if (sub.id) idMap[sub.id] = newSubtask.id;
                     }
                 }
             }
@@ -389,7 +394,7 @@ class TemplatesService {
             for (const sub of subtasks) {
                 const newParentId = idMap[sub.parent_task_id];
                 if (!newParentId) continue;
-                await Task.create(
+                const newSubtask = await Task.create(
                     {
                         uid: generateUid(),
                         name: sub.name,
@@ -404,13 +409,15 @@ class TemplatesService {
                     },
                     { transaction }
                 );
+
+                if (sub.id) idMap[sub.id] = newSubtask.id;
             }
 
             if (sourceJson.Subtasks) {
                 for (const sub of sourceJson.Subtasks) {
                     const newParentId = idMap[sub.parent_task_id];
                     if (!newParentId) continue;
-                    await Task.create(
+                    const newSubtask = await Task.create(
                         {
                             uid: generateUid(),
                             name: sub.name,
@@ -425,7 +432,16 @@ class TemplatesService {
                         },
                         { transaction }
                     );
+
+                    if (sub.id) idMap[sub.id] = newSubtask.id;
                 }
+            }
+
+            if (options.copyStoredRelations) {
+                await relationService.copyRelationsForTaskIds(
+                    idMap,
+                    transaction
+                );
             }
         });
     }
@@ -587,6 +603,9 @@ class TemplatesService {
                 Tasks: templateData.structure.tasks,
                 Subtasks: [],
             };
+            // No copyStoredRelations here: these task ids come from the
+            // marketplace payload, not from this database, so looking up
+            // relations by them would read unrelated local rows.
             await this._copyTasksToProject(fakeSource, template, userId, {
                 resetStatus: true,
             });

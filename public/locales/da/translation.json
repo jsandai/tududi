@@ -2094,5 +2094,28 @@
     "stayHint": "Du forbliver logget ind på denne enhed i 30 dage.",
     "invalid": "Dette login-link virker ikke længere.",
     "invalidHint": "Det kan allerede være brugt eller udløbet. Bed personen, der sendte det, om et nyt."
+  },
+  "taskRelations": {
+    "title": "Relationer",
+    "add": "Tilføj relation",
+    "empty": "Ingen relationer endnu",
+    "selectType": "Relationstype",
+    "searchTasks": "Søg i opgaver",
+    "noTasks": "Ingen opgaver fundet",
+    "saving": "Tilføjer...",
+    "remove": "Fjern relation",
+    "blocked": "Blokeret",
+    "blockedDescription": "Denne opgave har en ufærdig blokering",
+    "loadError": "Kunne ikke hente opgaverelationer",
+    "optionsError": "Kunne ikke hente opgaver",
+    "createError": "Kunne ikke tilføje opgaverelation",
+    "removeError": "Kunne ikke fjerne opgaverelation",
+    "types": {
+      "blocks": "Blokerer",
+      "blocked_by": "Blokeret af",
+      "related_to": "Relateret til",
+      "duplicates": "Duplikerer",
+      "duplicated_by": "Duplikeret af"
+    }
   }
 }

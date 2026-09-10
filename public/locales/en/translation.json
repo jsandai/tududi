@@ -2120,5 +2120,28 @@
     "ctaTitle": "Do you want to share your notes?",
     "ctaBody": "Write notes, keep them organized with your tasks and projects, and share any of them with a link.",
     "ctaButton": "Sign up now"
+  },
+  "taskRelations": {
+    "title": "Relations",
+    "add": "Add relation",
+    "empty": "No relations yet",
+    "selectType": "Relation type",
+    "searchTasks": "Search tasks",
+    "noTasks": "No tasks found",
+    "saving": "Adding...",
+    "remove": "Remove relation",
+    "blocked": "Blocked",
+    "blockedDescription": "This task has an unfinished blocker",
+    "loadError": "Failed to load task relations",
+    "optionsError": "Failed to load tasks",
+    "createError": "Failed to add task relation",
+    "removeError": "Failed to remove task relation",
+    "types": {
+      "blocks": "Blocks",
+      "blocked_by": "Blocked by",
+      "related_to": "Related to",
+      "duplicates": "Duplicates",
+      "duplicated_by": "Duplicated by"
+    }
   }
 }

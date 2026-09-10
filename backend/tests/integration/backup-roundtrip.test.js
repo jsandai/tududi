@@ -5,6 +5,7 @@ const {
     Goal,
     Project,
     Task,
+    TaskRelation,
     Tag,
     Note,
     Person,
@@ -80,6 +81,12 @@ async function seedSource(user) {
         name: 'Weekly instance',
         user_id: user.id,
         recurring_parent_id: recurring.id,
+    });
+
+    await TaskRelation.create({
+        source_task_id: recurring.id,
+        target_task_id: parent.id,
+        relation_type: 'blocks',
     });
 
     const uploadsDir = path.join(config.uploadPath, 'tasks');
@@ -275,6 +282,11 @@ describe('Backup export and import round trip (format 2)', () => {
         const recurring = await Task.findOne({
             where: { user_id: target.id, name: 'Weekly' },
         });
+        const relations = await TaskRelation.findAll();
+        expect(relations).toHaveLength(1);
+        expect(relations[0].source_task_id).toBe(recurring.id);
+        expect(relations[0].target_task_id).toBe(parent.id);
+        expect(relations[0].relation_type).toBe('blocks');
         const instance = await Task.findOne({
             where: { user_id: target.id, name: 'Weekly instance' },
         });
@@ -367,6 +379,100 @@ describe('Backup export and import round trip (format 2)', () => {
         const untouchedTarget = await User.findByPk(target.id);
         expect(untouchedTarget.appearance).toBe('light');
         expect(untouchedTarget.avatar_image).toBeFalsy();
+    });
+
+    it('does not restore a blocking edge that would close a loop', async () => {
+        const backup = await exportUserData(source.id);
+
+        // The edge is replaced by its reverse while the backup sits on disk.
+        const parent = await Task.findOne({
+            where: { user_id: source.id, name: 'Parent' },
+        });
+        const recurring = await Task.findOne({
+            where: { user_id: source.id, name: 'Weekly' },
+        });
+        await TaskRelation.destroy({ where: {} });
+        await TaskRelation.create({
+            source_task_id: parent.id,
+            target_task_id: recurring.id,
+            relation_type: 'blocks',
+        });
+
+        await importUserData(source.id, backup);
+
+        // Restoring the old edge on top of the new one would block both ends
+        // forever, so it is skipped and the current edge stands alone.
+        const relations = await TaskRelation.findAll();
+        expect(relations).toHaveLength(1);
+        expect(relations[0].source_task_id).toBe(parent.id);
+        expect(relations[0].target_task_id).toBe(recurring.id);
+    });
+
+    it('does not restore a duplicates edge that already exists the other way', async () => {
+        const parent = await Task.findOne({
+            where: { user_id: source.id, name: 'Parent' },
+        });
+        const recurring = await Task.findOne({
+            where: { user_id: source.id, name: 'Weekly' },
+        });
+        await TaskRelation.destroy({ where: {} });
+        await TaskRelation.create({
+            source_task_id: parent.id,
+            target_task_id: recurring.id,
+            relation_type: 'duplicates',
+        });
+
+        const backup = await exportUserData(source.id);
+
+        // The same pair, recorded facing the other way while the backup sat
+        // on disk. It is the same duplicate pair, not a second one.
+        await TaskRelation.destroy({ where: {} });
+        await TaskRelation.create({
+            source_task_id: recurring.id,
+            target_task_id: parent.id,
+            relation_type: 'duplicates',
+        });
+
+        await importUserData(source.id, backup);
+
+        expect(await TaskRelation.count()).toBe(1);
+    });
+
+    it('stores a restored symmetric relation in canonical order', async () => {
+        const parent = await Task.findOne({
+            where: { user_id: source.id, name: 'Parent' },
+        });
+        const recurring = await Task.findOne({
+            where: { user_id: source.id, name: 'Weekly' },
+        });
+        await TaskRelation.destroy({ where: {} });
+        await TaskRelation.create({
+            source_task_id: Math.min(parent.id, recurring.id),
+            target_task_id: Math.max(parent.id, recurring.id),
+            relation_type: 'related_to',
+        });
+
+        const backup = await exportUserData(source.id);
+        const entry = backup.data.task_relations.find(
+            (r) => r.relation_type === 'related_to'
+        );
+        // A backup records whatever orientation the ids had when it was
+        // written, which need not match the ids it is restored onto.
+        [entry.source_task_uid, entry.target_task_uid] = [
+            entry.target_task_uid,
+            entry.source_task_uid,
+        ];
+
+        await TaskRelation.destroy({ where: {} });
+        await importUserData(source.id, backup);
+
+        const restored = await TaskRelation.findAll({
+            where: { relation_type: 'related_to' },
+        });
+        expect(restored).toHaveLength(1);
+        expect(restored[0].source_task_id).toBeLessThan(
+            restored[0].target_task_id
+        );
     });
 
     it('never links a legacy backup to another user rows by numeric id', async () => {

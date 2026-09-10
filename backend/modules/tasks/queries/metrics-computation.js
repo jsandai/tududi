@@ -16,6 +16,7 @@ const {
     fetchSomedayFallbackTasks,
     fetchTasksCompletedToday,
 } = require('./metrics-queries');
+const relationService = require('../relations/service');
 
 const MAX_SUGGESTED_TASKS = 50;
 
@@ -126,7 +127,11 @@ async function computeSuggestedTasks(
 
     const now = Date.now();
     const DUE_DATE_HORIZON_MS = 3 * 24 * 60 * 60 * 1000;
+    const blockedTaskIds = await relationService.getBlockedTaskIds(
+        combinedTasks.map((task) => task.id)
+    );
     const filteredTasks = combinedTasks.filter((task) => {
+        if (blockedTaskIds.has(task.id)) return false;
         if (task.defer_until) {
             const deferUntil = new Date(task.defer_until).getTime();
             if (!Number.isNaN(deferUntil) && deferUntil > now) return false;

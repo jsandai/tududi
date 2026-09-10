@@ -2094,5 +2094,28 @@
     "stayHint": "Bu cihazda 30 gün oturum açık kalacaksın.",
     "invalid": "Bu oturum açma bağlantısı artık çalışmıyor.",
     "invalidHint": "Daha önce kullanılmış veya süresi dolmuş olabilir. Gönderen kişiden yenisini iste."
+  },
+  "taskRelations": {
+    "title": "İlişkiler",
+    "add": "İlişki ekle",
+    "empty": "Henüz ilişki yok",
+    "selectType": "İlişki türü",
+    "searchTasks": "Görevlerde ara",
+    "noTasks": "Görev bulunamadı",
+    "saving": "Ekleniyor...",
+    "remove": "İlişkiyi kaldır",
+    "blocked": "Engellendi",
+    "blockedDescription": "Bu görevin tamamlanmamış bir engelleyicisi var",
+    "loadError": "Görev ilişkileri yüklenemedi",
+    "optionsError": "Görevler yüklenemedi",
+    "createError": "Görev ilişkisi eklenemedi",
+    "removeError": "Görev ilişkisi kaldırılamadı",
+    "types": {
+      "blocks": "Engeller",
+      "blocked_by": "Tarafından engellendi",
+      "related_to": "İlgili",
+      "duplicates": "Yineler",
+      "duplicated_by": "Tarafından yinelendi"
+    }
   }
 }

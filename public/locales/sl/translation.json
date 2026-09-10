@@ -2096,5 +2096,28 @@
     "stayHint": "Na tej napravi boste ostali prijavljeni 30 dni.",
     "invalid": "Ta povezava za prijavo ne deluje več.",
     "invalidHint": "Morda je bila že uporabljena ali je potekla. Prosite osebo, ki vam jo je poslala, za novo."
+  },
+  "taskRelations": {
+    "title": "Povezave",
+    "add": "Dodaj povezavo",
+    "empty": "Povezav še ni",
+    "selectType": "Vrsta povezave",
+    "searchTasks": "Išči naloge",
+    "noTasks": "Ni najdenih nalog",
+    "saving": "Dodajanje...",
+    "remove": "Odstrani povezavo",
+    "blocked": "Blokirana",
+    "blockedDescription": "Ta naloga ima nedokončano blokirajočo nalogo",
+    "loadError": "Povezav ni bilo mogoče naložiti",
+    "optionsError": "Nalog ni bilo mogoče naložiti",
+    "createError": "Povezave ni bilo mogoče dodati",
+    "removeError": "Povezave ni bilo mogoče odstraniti",
+    "types": {
+      "blocks": "Blokira",
+      "blocked_by": "Blokira jo",
+      "related_to": "Povezana z",
+      "duplicates": "Podvaja",
+      "duplicated_by": "Podvojena z"
+    }
   }
 }

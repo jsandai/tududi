@@ -10,6 +10,7 @@ import {
     ListBulletIcon,
     ChevronDownIcon,
     ChatBubbleLeftIcon,
+    LockClosedIcon,
 } from '@heroicons/react/24/outline';
 import { FolderIcon, FireIcon } from '@heroicons/react/24/solid';
 import { Task } from '../../../entities/Task';
@@ -229,6 +230,15 @@ const TaskRowCollapsed: React.FC<TaskRowCollapsedProps> = ({
                             }`}
                         >
                             {currentName}
+                        </span>
+                    )}
+                    {!editable && task.is_blocked && (
+                        <span
+                            className="ml-1 inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                            title={t('taskRelations.blockedDescription')}
+                        >
+                            <LockClosedIcon className="h-3 w-3" />
+                            {t('taskRelations.blocked')}
                         </span>
                     )}
                     {!editable && commentCount > 0 && (

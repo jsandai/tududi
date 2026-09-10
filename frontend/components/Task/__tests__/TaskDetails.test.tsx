@@ -120,6 +120,7 @@ jest.mock('../TaskDetails/', () => ({
             ))}
         </div>
     ),
+    TaskRelationsCard: () => null,
     TaskRecurrenceCard: () => null,
     TaskDueDateCard: () => null,
     TaskDeferUntilCard: () => null,
