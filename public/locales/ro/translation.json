@@ -1779,5 +1779,28 @@
       "backups_import": "importul de copii de rezervă",
       "attachments": "atașamentele"
     }
+  },
+  "taskRelations": {
+    "title": "Relații",
+    "add": "Adaugă relație",
+    "empty": "Nicio relație încă",
+    "selectType": "Tipul relației",
+    "searchTasks": "Caută sarcini",
+    "noTasks": "Nu s-au găsit sarcini",
+    "saving": "Se adaugă...",
+    "remove": "Elimină relația",
+    "blocked": "Blocată",
+    "blockedDescription": "Această sarcină are un blocaj nefinalizat",
+    "loadError": "Relațiile nu au putut fi încărcate",
+    "optionsError": "Sarcinile nu au putut fi încărcate",
+    "createError": "Relația nu a putut fi adăugată",
+    "removeError": "Relația nu a putut fi eliminată",
+    "types": {
+      "blocks": "Blochează",
+      "blocked_by": "Blocată de",
+      "related_to": "Asociată cu",
+      "duplicates": "Duplică",
+      "duplicated_by": "Duplicată de"
+    }
   }
 }

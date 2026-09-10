@@ -10,6 +10,7 @@ const { calculateInitialDueDate } = require('../../tasks/core/builders');
 const { handleRecurrenceUpdate } = require('../../tasks/operations/recurring');
 const { Op } = require('sequelize');
 const { Task, Project, Tag } = require('../../../models');
+const relationService = require('../../tasks/relations/service');
 const {
     validateProjectAccess,
     validateDeferUntilAndDueDate,
@@ -159,6 +160,11 @@ function registerTaskTools(server, context, tools) {
                     description: 'Maximum number of tasks to return',
                     default: 50,
                 },
+                actionable: {
+                    type: 'boolean',
+                    description:
+                        'Return only active, non-deferred tasks with no open blockers',
+                },
             },
         },
         handler: async (params) => {
@@ -194,6 +200,32 @@ function registerTaskTools(server, context, tools) {
                 whereClause.status = 3;
             } else if (params.type === 'today' || params.type === 'upcoming') {
                 whereClause.status = { [Op.ne]: 3 };
+            }
+
+            // Actionable means a task someone could pick up now: not finished,
+            // not deferred to a later date, and not waiting on a blocker. The
+            // blocker test is only applied here, because a completed task that
+            // still has an incoming block is legitimately completed.
+            if (params.actionable === true || params.actionable === 'true') {
+                whereClause[Op.and] = [
+                    ...(whereClause[Op.and] || []),
+                    {
+                        status: {
+                            [Op.notIn]: [
+                                Task.STATUS.DONE,
+                                Task.STATUS.ARCHIVED,
+                                Task.STATUS.CANCELLED,
+                            ],
+                        },
+                    },
+                    {
+                        [Op.or]: [
+                            { defer_until: null },
+                            { defer_until: { [Op.lte]: new Date() } },
+                        ],
+                    },
+                    relationService.getActionableRelationPredicate(),
+                ];
             }
 
             const tasks = await taskRepository.findAll(whereClause, {
@@ -813,7 +845,117 @@ function registerTaskTools(server, context, tools) {
         },
     });
 
-    // 7. add_subtask - Add subtask to parent
+    // 7. create_task_relation - Relate two tasks
+    tools.push({
+        name: 'create_task_relation',
+        description: 'Create a relation between two tasks',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                task_id: {
+                    type: ['number', 'string'],
+                    description: 'Task ID or UID',
+                },
+                related_task_id: {
+                    type: ['number', 'string'],
+                    description: 'Related task ID or UID',
+                },
+                type: {
+                    type: 'string',
+                    enum: relationService.INPUT_TYPES,
+                    description: 'Relationship from task_id to related_task_id',
+                },
+            },
+            required: ['task_id', 'related_task_id', 'type'],
+        },
+        handler: async (params) => {
+            const relation = await relationService.createRelation(
+                context.userId,
+                params.task_id,
+                params.related_task_id,
+                params.type
+            );
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({ relation }, null, 2),
+                    },
+                ],
+            };
+        },
+    });
+
+    // 8. list_task_relations - List a task's relations
+    tools.push({
+        name: 'list_task_relations',
+        description: 'List the relations for a task',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                task_id: {
+                    type: ['number', 'string'],
+                    description: 'Task ID or UID',
+                },
+            },
+            required: ['task_id'],
+        },
+        handler: async (params) => {
+            const relations = await relationService.listRelations(
+                context.userId,
+                params.task_id
+            );
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify(
+                            { count: relations.length, relations },
+                            null,
+                            2
+                        ),
+                    },
+                ],
+            };
+        },
+    });
+
+    // 9. remove_task_relation - Remove a relation from a task
+    tools.push({
+        name: 'remove_task_relation',
+        description: 'Remove a relation from a task',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                task_id: {
+                    type: ['number', 'string'],
+                    description: 'Task ID or UID',
+                },
+                relation_id: {
+                    type: 'string',
+                    description: 'Relation UID returned by list_task_relations',
+                },
+            },
+            required: ['task_id', 'relation_id'],
+        },
+        handler: async (params) => {
+            const relation = await relationService.removeRelation(
+                context.userId,
+                params.task_id,
+                params.relation_id
+            );
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({ relation }, null, 2),
+                    },
+                ],
+            };
+        },
+    });
+
+    // 10. add_subtask - Add subtask to parent
     tools.push({
         name: 'add_subtask',
         description: 'Add a subtask to an existing task',
@@ -912,7 +1054,7 @@ function registerTaskTools(server, context, tools) {
         },
     });
 
-    // 8. get_task_metrics - Get task statistics
+    // 11. get_task_metrics - Get task statistics
     tools.push({
         name: 'get_task_metrics',
         description: 'Get task statistics and productivity metrics',

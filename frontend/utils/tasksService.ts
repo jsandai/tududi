@@ -1,5 +1,5 @@
 import { Metrics } from '../entities/Metrics';
-import { Task } from '../entities/Task';
+import { Task, TaskRelation, TaskRelationType } from '../entities/Task';
 import {
     handleAuthResponse,
     getDefaultHeaders,
@@ -196,6 +196,79 @@ export const fetchTaskByUid = async (uid: string): Promise<Task> => {
 
     await handleAuthResponse(response, 'Failed to fetch task.');
     return await response.json();
+};
+
+export const fetchTaskRelations = async (
+    taskUid: string
+): Promise<TaskRelation[]> => {
+    const response = await fetch(
+        getApiPath(`task/${encodeURIComponent(taskUid)}/relations`),
+        {
+            credentials: 'include',
+            headers: getDefaultHeaders(),
+        }
+    );
+    await handleAuthResponse(response, 'Failed to fetch task relations.');
+    const result = await response.json();
+    return result.relations || [];
+};
+
+export const createTaskRelation = async (
+    taskUid: string,
+    relatedTaskUid: string,
+    type: TaskRelationType
+): Promise<TaskRelation> => {
+    const response = await fetch(
+        getApiPath(`task/${encodeURIComponent(taskUid)}/relations`),
+        {
+            method: 'POST',
+            credentials: 'include',
+            headers: await getPostHeadersWithCsrf(),
+            body: JSON.stringify({
+                related_task_uid: relatedTaskUid,
+                type,
+            }),
+        }
+    );
+    await handleAuthResponse(response, 'Failed to create task relation.');
+    return await response.json();
+};
+
+export const removeTaskRelation = async (
+    taskUid: string,
+    relationUid: string
+): Promise<void> => {
+    const response = await fetch(
+        getApiPath(
+            `task/${encodeURIComponent(taskUid)}/relations/${encodeURIComponent(relationUid)}`
+        ),
+        {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: await getPostHeadersWithCsrf(),
+        }
+    );
+    await handleAuthResponse(response, 'Failed to remove task relation.');
+};
+
+export const fetchRelationTaskOptions = async (
+    search = ''
+): Promise<Task[]> => {
+    const query = new URLSearchParams({
+        type: 'all',
+        status: 'all',
+        include_subtasks: 'true',
+        limit: '50',
+    });
+    if (search.trim()) query.set('search', search.trim());
+
+    const response = await fetch(getApiPath(`tasks?${query.toString()}`), {
+        credentials: 'include',
+        headers: getDefaultHeaders(),
+    });
+    await handleAuthResponse(response, 'Failed to fetch task options.');
+    const result = await response.json();
+    return Array.isArray(result.tasks) ? result.tasks : [];
 };
 
 export const fetchSubtasks = async (parentTaskUid: string): Promise<Task[]> => {

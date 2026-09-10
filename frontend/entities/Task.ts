@@ -54,6 +54,7 @@ export interface Task {
     assigned_to?: string | null;
     AssignedTo?: Person | null;
     involves?: string[];
+    is_blocked?: boolean;
     // Transient UI field set by suggestion scoring - never persisted or sent to server
     _suggestionMeta?: {
         score: number;
@@ -61,6 +62,25 @@ export interface Task {
         reasonLabel: string;
         reasonColor: string;
     };
+}
+
+export type TaskRelationType =
+    | 'blocks'
+    | 'blocked_by'
+    | 'related_to'
+    | 'duplicates'
+    | 'duplicated_by';
+
+export interface TaskRelation {
+    uid: string;
+    type: TaskRelationType;
+    related_task: {
+        id: number;
+        uid: string;
+        name: string;
+        status: StatusType | number;
+    };
+    created_at?: string;
 }
 
 export type StatusType =

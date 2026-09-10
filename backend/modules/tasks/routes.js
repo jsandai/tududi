@@ -27,6 +27,7 @@ const {
     calculateVirtualOccurrences,
     shouldGenerateNextTask,
 } = require('./recurringTaskService');
+const relationsRouter = require('./relations/routes');
 const { logError } = require('../../services/logService');
 const { logEvent } = require('./taskEventService');
 
@@ -1094,5 +1095,7 @@ router.get('/task/:uid/next-iterations', async (req, res) => {
 // Mount sub-routers for task-related routes
 router.use(attachmentsRouter);
 router.use(eventsRouter);
+
+router.use(relationsRouter);
 
 module.exports = router;

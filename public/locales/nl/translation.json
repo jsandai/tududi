@@ -1779,5 +1779,28 @@
       "backups_import": "back-upimport",
       "attachments": "bijlagen"
     }
+  },
+  "taskRelations": {
+    "title": "Relaties",
+    "add": "Relatie toevoegen",
+    "empty": "Nog geen relaties",
+    "selectType": "Relatietype",
+    "searchTasks": "Taken zoeken",
+    "noTasks": "Geen taken gevonden",
+    "saving": "Toevoegen...",
+    "remove": "Relatie verwijderen",
+    "blocked": "Geblokkeerd",
+    "blockedDescription": "Deze taak heeft een onvoltooide blokkering",
+    "loadError": "Taakrelaties konden niet worden geladen",
+    "optionsError": "Taken konden niet worden geladen",
+    "createError": "Taakrelatie kon niet worden toegevoegd",
+    "removeError": "Taakrelatie kon niet worden verwijderd",
+    "types": {
+      "blocks": "Blokkeert",
+      "blocked_by": "Geblokkeerd door",
+      "related_to": "Gerelateerd aan",
+      "duplicates": "Dupliceert",
+      "duplicated_by": "Gedupliceerd door"
+    }
   }
 }

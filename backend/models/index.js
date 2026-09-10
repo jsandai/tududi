@@ -57,6 +57,7 @@ const User = require('./user')(sequelize);
 const Area = require('./area')(sequelize);
 const Project = require('./project')(sequelize);
 const Task = require('./task')(sequelize);
+const TaskRelation = require('./task_relation')(sequelize);
 const Tag = require('./tag')(sequelize);
 const Note = require('./note')(sequelize);
 const InboxItem = require('./inbox_item')(sequelize);
@@ -142,6 +143,37 @@ Task.belongsTo(Task, {
 Task.hasMany(Task, {
     as: 'Subtasks',
     foreignKey: 'parent_task_id',
+});
+
+Task.hasMany(TaskRelation, {
+    as: 'OutgoingRelations',
+    foreignKey: 'source_task_id',
+});
+Task.hasMany(TaskRelation, {
+    as: 'IncomingRelations',
+    foreignKey: 'target_task_id',
+});
+TaskRelation.belongsTo(Task, {
+    as: 'SourceTask',
+    foreignKey: 'source_task_id',
+});
+TaskRelation.belongsTo(Task, {
+    as: 'TargetTask',
+    foreignKey: 'target_task_id',
+});
+
+// Task deletion temporarily disables SQLite foreign-key checks in some paths,
+// so remove relation rows explicitly instead of relying on database cascades.
+Task.addHook('beforeDestroy', async (task, options) => {
+    await TaskRelation.destroy({
+        where: {
+            [Sequelize.Op.or]: [
+                { source_task_id: task.id },
+                { target_task_id: task.id },
+            ],
+        },
+        transaction: options.transaction,
+    });
 });
 
 Task.belongsTo(Task, {
@@ -461,6 +493,7 @@ module.exports = {
     Goal,
     Project,
     Task,
+    TaskRelation,
     Tag,
     Note,
     InboxItem,

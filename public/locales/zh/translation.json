@@ -1779,5 +1779,28 @@
       "backups_import": "备份导入",
       "attachments": "附件"
     }
+  },
+  "taskRelations": {
+    "title": "任务关系",
+    "add": "添加关系",
+    "empty": "暂无关系",
+    "selectType": "关系类型",
+    "searchTasks": "搜索任务",
+    "noTasks": "未找到任务",
+    "saving": "正在添加...",
+    "remove": "移除关系",
+    "blocked": "已阻塞",
+    "blockedDescription": "此任务存在未完成的阻塞任务",
+    "loadError": "无法加载任务关系",
+    "optionsError": "无法加载任务",
+    "createError": "无法添加任务关系",
+    "removeError": "无法移除任务关系",
+    "types": {
+      "blocks": "阻塞",
+      "blocked_by": "被阻塞于",
+      "related_to": "相关于",
+      "duplicates": "重复",
+      "duplicated_by": "被重复于"
+    }
   }
 }

@@ -1779,5 +1779,28 @@
       "backups_import": "l'import de sauvegardes",
       "attachments": "les pièces jointes"
     }
+  },
+  "taskRelations": {
+    "title": "Relations",
+    "add": "Ajouter une relation",
+    "empty": "Aucune relation",
+    "selectType": "Type de relation",
+    "searchTasks": "Rechercher des tâches",
+    "noTasks": "Aucune tâche trouvée",
+    "saving": "Ajout...",
+    "remove": "Supprimer la relation",
+    "blocked": "Bloquée",
+    "blockedDescription": "Cette tâche a un bloqueur non terminé",
+    "loadError": "Impossible de charger les relations",
+    "optionsError": "Impossible de charger les tâches",
+    "createError": "Impossible d'ajouter la relation",
+    "removeError": "Impossible de supprimer la relation",
+    "types": {
+      "blocks": "Bloque",
+      "blocked_by": "Bloquée par",
+      "related_to": "Liée à",
+      "duplicates": "Duplique",
+      "duplicated_by": "Dupliquée par"
+    }
   }
 }

@@ -7,6 +7,7 @@ const {
     sequelize,
 } = require('../../../models');
 const { Op, QueryTypes } = require('sequelize');
+const { ciLike } = require('../../../utils/db-dialect');
 const permissionsService = require('../../../services/permissionsService');
 const {
     getSafeTimezone,
@@ -429,8 +430,17 @@ async function filterTasksByParams(
         }
     }
 
+    // Applied after the switch because the upcoming branch replaces
+    // whereClause outright.
+    const searchTerm =
+        typeof params.search === 'string' ? params.search.trim() : '';
+
     const finalWhereClause = {
-        [Op.and]: [ownedOrShared, whereClause],
+        [Op.and]: [
+            ownedOrShared,
+            whereClause,
+            ...(searchTerm ? [{ name: ciLike(`%${searchTerm}%`) }] : []),
+        ],
     };
 
     if (page) {
