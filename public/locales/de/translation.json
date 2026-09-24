@@ -2103,5 +2103,28 @@
     "stayHint": "Du bleibst auf diesem Gerät 30 Tage angemeldet.",
     "invalid": "Dieser Anmeldelink funktioniert nicht mehr.",
     "invalidHint": "Er wurde vielleicht schon verwendet oder ist abgelaufen. Bitte die Person, die ihn gesendet hat, um einen neuen."
+  },
+  "taskRelations": {
+    "title": "Beziehungen",
+    "add": "Beziehung hinzufügen",
+    "empty": "Noch keine Beziehungen",
+    "selectType": "Beziehungstyp",
+    "searchTasks": "Aufgaben suchen",
+    "noTasks": "Keine Aufgaben gefunden",
+    "saving": "Wird hinzugefügt...",
+    "remove": "Beziehung entfernen",
+    "blocked": "Blockiert",
+    "blockedDescription": "Diese Aufgabe hat eine unerledigte blockierende Aufgabe",
+    "loadError": "Aufgabenbeziehungen konnten nicht geladen werden",
+    "optionsError": "Aufgaben konnten nicht geladen werden",
+    "createError": "Aufgabenbeziehung konnte nicht hinzugefügt werden",
+    "removeError": "Aufgabenbeziehung konnte nicht entfernt werden",
+    "types": {
+      "blocks": "Blockiert",
+      "blocked_by": "Blockiert durch",
+      "related_to": "Verknüpft mit",
+      "duplicates": "Dupliziert",
+      "duplicated_by": "Dupliziert durch"
+    }
   }
 }

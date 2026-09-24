@@ -2094,5 +2094,28 @@
     "stayHint": "Pysyt kirjautuneena tällä laitteella 30 päivää.",
     "invalid": "Tämä kirjautumislinkki ei enää toimi.",
     "invalidHint": "Se on ehkä jo käytetty tai vanhentunut. Pyydä uusi sen lähettäneeltä."
+  },
+  "taskRelations": {
+    "title": "Suhteet",
+    "add": "Lisää suhde",
+    "empty": "Ei suhteita vielä",
+    "selectType": "Suhteen tyyppi",
+    "searchTasks": "Hae tehtäviä",
+    "noTasks": "Tehtäviä ei löytynyt",
+    "saving": "Lisätään...",
+    "remove": "Poista suhde",
+    "blocked": "Estetty",
+    "blockedDescription": "Tällä tehtävällä on keskeneräinen estävä tehtävä",
+    "loadError": "Tehtäväsuhteiden lataaminen epäonnistui",
+    "optionsError": "Tehtävien lataaminen epäonnistui",
+    "createError": "Tehtäväsuhteen lisääminen epäonnistui",
+    "removeError": "Tehtäväsuhteen poistaminen epäonnistui",
+    "types": {
+      "blocks": "Estää",
+      "blocked_by": "Estäjänä",
+      "related_to": "Liittyy tehtävään",
+      "duplicates": "Kopioi",
+      "duplicated_by": "Kopioitu tehtävästä"
+    }
   }
 }

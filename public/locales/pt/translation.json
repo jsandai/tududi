@@ -2095,5 +2095,28 @@
     "stayHint": "Ficará com a sessão iniciada neste dispositivo durante 30 dias.",
     "invalid": "Este link de acesso já não funciona.",
     "invalidHint": "Pode já ter sido usado ou ter expirado. Peça um novo a quem o enviou."
+  },
+  "taskRelations": {
+    "title": "Relações",
+    "add": "Adicionar relação",
+    "empty": "Ainda não há relações",
+    "selectType": "Tipo de relação",
+    "searchTasks": "Pesquisar tarefas",
+    "noTasks": "Nenhuma tarefa encontrada",
+    "saving": "Adicionando...",
+    "remove": "Remover relação",
+    "blocked": "Bloqueada",
+    "blockedDescription": "Esta tarefa tem um bloqueador não concluído",
+    "loadError": "Não foi possível carregar as relações",
+    "optionsError": "Não foi possível carregar as tarefas",
+    "createError": "Não foi possível adicionar a relação",
+    "removeError": "Não foi possível remover a relação",
+    "types": {
+      "blocks": "Bloqueia",
+      "blocked_by": "Bloqueada por",
+      "related_to": "Relacionada a",
+      "duplicates": "Duplica",
+      "duplicated_by": "Duplicada por"
+    }
   }
 }

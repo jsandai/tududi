@@ -57,6 +57,7 @@ const User = require('./user')(sequelize);
 const Area = require('./area')(sequelize);
 const Project = require('./project')(sequelize);
 const Task = require('./task')(sequelize);
+const TaskRelation = require('./task_relation')(sequelize);
 const Tag = require('./tag')(sequelize);
 const Note = require('./note')(sequelize);
 const InboxItem = require('./inbox_item')(sequelize);
@@ -166,6 +167,63 @@ Task.belongsTo(Task, {
 Task.hasMany(Task, {
     as: 'Subtasks',
     foreignKey: 'parent_task_id',
+});
+
+Task.hasMany(TaskRelation, {
+    as: 'OutgoingRelations',
+    foreignKey: 'source_task_id',
+});
+Task.hasMany(TaskRelation, {
+    as: 'IncomingRelations',
+    foreignKey: 'target_task_id',
+});
+TaskRelation.belongsTo(Task, {
+    as: 'SourceTask',
+    foreignKey: 'source_task_id',
+});
+TaskRelation.belongsTo(Task, {
+    as: 'TargetTask',
+    foreignKey: 'target_task_id',
+});
+
+// Task deletion temporarily disables SQLite foreign-key checks in some paths,
+// so remove relation rows explicitly instead of relying on database cascades.
+Task.addHook('beforeDestroy', async (task, options) => {
+    await TaskRelation.destroy({
+        where: {
+            [Sequelize.Op.or]: [
+                { source_task_id: task.id },
+                { target_task_id: task.id },
+            ],
+        },
+        transaction: options.transaction,
+    });
+});
+
+// Bulk deletes (project and template deletion, account erasure) fire
+// beforeBulkDestroy rather than beforeDestroy, so the hook above never sees
+// them. Leaving it to the row level cascade would tie relation cleanup to
+// whether foreign key enforcement is on for that connection, which the task
+// delete paths deliberately switch off.
+Task.addHook('beforeBulkDestroy', async (options) => {
+    const doomed = await Task.findAll({
+        where: options.where || {},
+        attributes: ['id'],
+        raw: true,
+        transaction: options.transaction,
+    });
+    if (doomed.length === 0) return;
+
+    const ids = doomed.map((task) => task.id);
+    await TaskRelation.destroy({
+        where: {
+            [Sequelize.Op.or]: [
+                { source_task_id: { [Sequelize.Op.in]: ids } },
+                { target_task_id: { [Sequelize.Op.in]: ids } },
+            ],
+        },
+        transaction: options.transaction,
+    });
 });
 
 Task.belongsTo(Task, {
@@ -512,6 +570,7 @@ module.exports = {
     Goal,
     Project,
     Task,
+    TaskRelation,
     Tag,
     Note,
     InboxItem,

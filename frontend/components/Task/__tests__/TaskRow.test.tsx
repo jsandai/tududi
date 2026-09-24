@@ -90,6 +90,20 @@ const renderRow = (task: Task, props: any = {}) =>
 describe('TaskRow', () => {
     beforeEach(() => navigateMock.mockClear());
 
+    it('marks a blocked task in the row', () => {
+        renderRow(baseTask({ is_blocked: true }));
+        expect(
+            screen.getByTitle('taskRelations.blockedDescription')
+        ).toBeInTheDocument();
+    });
+
+    it('leaves an unblocked task unmarked', () => {
+        renderRow(baseTask());
+        expect(
+            screen.queryByTitle('taskRelations.blockedDescription')
+        ).not.toBeInTheDocument();
+    });
+
     it('renders the task title collapsed', () => {
         renderRow(baseTask());
         expect(screen.getByText('Buy tickets')).toBeInTheDocument();

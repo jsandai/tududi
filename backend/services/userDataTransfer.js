@@ -28,8 +28,11 @@ const {
     Person,
     RecurringCompletion,
     TaskAttachment,
+    TaskRelation,
     sequelize,
 } = require('../models');
+const { Op } = require('sequelize');
+const relationService = require('../modules/tasks/relations/service');
 const { getConfig } = require('../config/config');
 const { uid: generateUid } = require('../utils/uid');
 const packageJson = require('../../package.json');
@@ -201,6 +204,22 @@ async function exportUserData(userId) {
         exportedTasks.push(data);
     }
 
+    // Relations are exported by uid, and only when both ends are in this
+    // export, so a restore never points a task at a row it did not bring.
+    const taskIdToUid = new Map(exportedTasks.map((t) => [t.id, t.uid]));
+    const exportedRelations = (
+        await TaskRelation.findAll({
+            where: {
+                source_task_id: { [Op.in]: [...taskIdToUid.keys()] },
+                target_task_id: { [Op.in]: [...taskIdToUid.keys()] },
+            },
+        })
+    ).map((relation) => ({
+        source_task_uid: taskIdToUid.get(relation.source_task_id),
+        target_task_uid: taskIdToUid.get(relation.target_task_id),
+        relation_type: relation.relation_type,
+    }));
+
     return {
         version: packageJson.version,
         format: FORMAT,
@@ -239,6 +258,7 @@ async function exportUserData(userId) {
             })),
             projects: exportedProjects,
             tasks: exportedTasks,
+            task_relations: exportedRelations,
             tags: tags.map(plain),
             notes: notes.map((n) => {
                 const data = plain(n);
@@ -685,6 +705,86 @@ async function importUserData(userId, backupData, options = { merge: true }) {
             if (recurringId) updates.recurring_parent_id = recurringId;
             if (Object.keys(updates).length)
                 await row.update(updates, { transaction });
+        }
+
+        // Third pass: relations, which need both endpoints to exist.
+        for (const relation of d.task_relations || []) {
+            const resolvedSourceId = await resolve(
+                Task,
+                relation.source_task_uid,
+                null,
+                uidMaps.tasks
+            );
+            const resolvedTargetId = await resolve(
+                Task,
+                relation.target_task_uid,
+                null,
+                uidMaps.tasks
+            );
+            if (!resolvedSourceId || !resolvedTargetId) {
+                count('task_relations', 'skipped');
+                continue;
+            }
+
+            // A restore can map a pair onto ids in the opposite order, so
+            // the stored orientation is decided here rather than carried over
+            // from the backup.
+            const [sourceId, targetId] = relationService.canonicalEndpoints(
+                relation.relation_type,
+                resolvedSourceId,
+                resolvedTargetId
+            );
+
+            // Restoring into the account the backup came from reuses the
+            // existing tasks, so a blocking edge that was valid when exported
+            // can close a loop against edges added since. Nothing downstream
+            // expects a cycle: it would leave both ends permanently blocked.
+            if (relation.relation_type === TaskRelation.TYPE.BLOCKS) {
+                await relationService.lockBlockingGraph(transaction);
+            }
+
+            if (
+                relation.relation_type === TaskRelation.TYPE.BLOCKS &&
+                (await relationService.wouldCreateBlockCycle(
+                    sourceId,
+                    targetId,
+                    transaction
+                ))
+            ) {
+                count('task_relations', 'skipped');
+                continue;
+            }
+
+            // The same pair can already be recorded facing the other way,
+            // which for duplicates is the same relation, not a second one.
+            const existing = await TaskRelation.findOne({
+                where: {
+                    relation_type: relation.relation_type,
+                    ...relationService.relationPairScope(
+                        relation.relation_type,
+                        sourceId,
+                        targetId
+                    ),
+                },
+                transaction,
+            });
+            if (existing) {
+                count('task_relations', 'skipped');
+                continue;
+            }
+
+            const [, created] = await TaskRelation.findOrCreate({
+                where: {
+                    source_task_id: sourceId,
+                    target_task_id: targetId,
+                    relation_type: relation.relation_type,
+                },
+                // A fresh uid: nothing references a relation's uid, and
+                // reusing it collides when the source account is still here.
+                defaults: { uid: generateUid() },
+                transaction,
+            });
+            count('task_relations', created ? 'created' : 'skipped');
         }
 
         for (const note of d.notes || []) {

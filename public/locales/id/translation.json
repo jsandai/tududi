@@ -2094,5 +2094,28 @@
     "stayHint": "Anda akan tetap masuk di perangkat ini selama 30 hari.",
     "invalid": "Tautan masuk ini tidak berfungsi lagi.",
     "invalidHint": "Mungkin sudah dipakai atau kedaluwarsa. Minta yang baru kepada orang yang mengirimkannya."
+  },
+  "taskRelations": {
+    "title": "Relasi",
+    "add": "Tambah relasi",
+    "empty": "Belum ada relasi",
+    "selectType": "Jenis relasi",
+    "searchTasks": "Cari tugas",
+    "noTasks": "Tugas tidak ditemukan",
+    "saving": "Menambahkan...",
+    "remove": "Hapus relasi",
+    "blocked": "Terblokir",
+    "blockedDescription": "Tugas ini memiliki penghalang yang belum selesai",
+    "loadError": "Gagal memuat relasi tugas",
+    "optionsError": "Gagal memuat tugas",
+    "createError": "Gagal menambahkan relasi tugas",
+    "removeError": "Gagal menghapus relasi tugas",
+    "types": {
+      "blocks": "Memblokir",
+      "blocked_by": "Diblokir oleh",
+      "related_to": "Terkait dengan",
+      "duplicates": "Menduplikasi",
+      "duplicated_by": "Diduplikasi oleh"
+    }
   }
 }
